@@ -90,5 +90,5 @@ if __name__ == "__main__":
             t_acc, v_acc = train(bert_classifier, train_dataloader, device, loss_fn,
                                  optimizer, scheduler, val_dataloader=val_dataloader, epochs=epochs)
 
-            with open("results/{lr}_{epochs}_{hidden_layer}.csv", "a") as f:
-                f.write(f'{t_acc},{v_acc}')
+            with open(f"results/{lr}_{epochs}_{hidden_layer}.csv", "a") as f:
+                f.write(f'{t_acc},{v_acc}\n')
