@@ -72,7 +72,7 @@ if __name__ == "__main__":
     set_seed(42)
 
     lrs = np.linspace(1e-6, 5e-5, 6)
-    epoch_range = [2, 3, 4, 5]
+    epoch_range = [3]
     hidden_layers = [True, False]
 
     param_combinations = list(itertools.product(
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     for params in tqdm(param_combinations):
         lr = params[0]
         epochs = params[1]
-        hidden_layer = [2]
+        hidden_layer = params[2]
 
         for i in trange(3):
             bert_classifier, optimizer, scheduler = initialize_model(device, train_dataloader,
@@ -90,5 +90,5 @@ if __name__ == "__main__":
             t_acc, v_acc = train(bert_classifier, train_dataloader, device, loss_fn,
                                  optimizer, scheduler, val_dataloader=val_dataloader, epochs=epochs)
 
-            with open(f"results/{lr}_{epochs}_{hidden_layer}.csv", "a") as f:
+            with open(f"results/{lr}_{hidden_layer}.csv", "a") as f:
                 f.write(f'{t_acc},{v_acc}\n')
