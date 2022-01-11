@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm, trange
 from bert_util import *
-from experiments.bert_preprocessing import preprocessing_for_bert
+from bert_preprocessing import preprocessing_for_bert
 
 if __name__ == "__main__":
 
