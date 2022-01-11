@@ -50,8 +50,8 @@ if __name__ == "__main__":
     print("Loaded tokenized data")
 
     # get train & test
-    train_inputs, train_masks = preprocessing_for_bert(train_data)
-    test_inputs, test_masks = preprocessing_for_bert(test_data)
+    train_inputs, train_masks = preprocessing_for_bert(train_data.text.values)
+    test_inputs, test_masks = preprocessing_for_bert(test_data.text.values)
 
     map_sent2int = {"negative": 0, "neutral": 1, "positive": 2}
     y_train = np.array([map_sent2int[label] for label in train_data.label.values])
