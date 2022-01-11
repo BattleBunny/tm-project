@@ -20,6 +20,7 @@ def preprocessing_for_bert(data, MAX_LEN=64):
     input_ids = []
     attention_masks = []
 
+    tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
     # For every sentence...
     for sent in data:
         # `encode_plus` will:
