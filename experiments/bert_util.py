@@ -1,4 +1,4 @@
-,  2.06e-05,import random
+import random
 import time
 
 import numpy as np
