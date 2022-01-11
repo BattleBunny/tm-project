@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm, trange
 from bert_util import *
+from experiments.bert_preprocessing import preprocessing_for_bert
 
 if __name__ == "__main__":
 
@@ -34,30 +35,13 @@ if __name__ == "__main__":
     # get tokenized data
     # first check whether data already exists
     if os.path.exists("../data/bert_tokenized/bert_train_data.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_test_data.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_y_train.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_y_val.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_train_inputs.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_train_masks.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_val_inputs.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_val_masks.pkl"):
+       os.path.exists("../data/bert_tokenized/bert_test_data.pkl"):
 
         with open("../data/bert_tokenized/bert_train_data.pkl", "rb") as f:
             train_data = pickle.load(f)
         with open("../data/bert_tokenized/bert_test_data.pkl", "rb") as f:
             test_data = pickle.load(f)
-        with open("../data/bert_tokenized/bert_y_train.pkl", "rb") as f:
-            y_train = pickle.load(f)
-        with open("../data/bert_tokenized/bert_y_val.pkl", "rb") as f:
-            y_val = pickle.load(f)
-        with open("../data/bert_tokenized/bert_train_inputs.pkl", "rb") as f:
-            train_inputs = pickle.load(f)
-        with open("../data/bert_tokenized/bert_val_inputs.pkl", "rb") as f:
-            val_inputs = pickle.load(f)
-        with open("../data/bert_tokenized/bert_train_masks.pkl", "rb") as f:
-            train_masks = pickle.load(f)
-        with open("../data/bert_tokenized/bert_val_masks.pkl", "rb") as f:
-            val_masks = pickle.load(f)
+
 
     else:
         print("Must run bert_preprocessing first")
@@ -65,9 +49,18 @@ if __name__ == "__main__":
 
     print("Loaded tokenized data")
 
+    # get train & test
+    train_inputs, train_masks = preprocessing_for_bert(train_data)
+    test_inputs, test_masks = preprocessing_for_bert(test_data)
+
+    map_sent2int = {"negative": 0, "neutral": 1, "positive": 2}
+    y_train = np.array([map_sent2int[label] for label in train_data.label.values])
+    y_test = np.array([map_sent2int[label] for label in test_data.label.values])
+
+
     # run experiments, write results
-    train_dataloader, val_dataloader = create_data_loaders(
-        train_data, train_inputs, val_inputs, train_masks, val_masks, y_train, y_val)
+    train_dataloader, test_dataloader = create_data_loaders(
+        train_data, train_inputs, test_inputs, train_masks, test_masks, y_train, y_test)
     loss_fn = nn.CrossEntropyLoss()
     set_seed(42)
 
@@ -79,8 +72,9 @@ if __name__ == "__main__":
         bert_classifier, optimizer, scheduler = initialize_model(device, train_dataloader,
                                                                  lr=lr, epochs=epochs, hidden_layer=hidden_layer)
 
-        t_acc, v_acc = train(bert_classifier, train_dataloader, device, loss_fn,
-                             optimizer, scheduler, val_dataloader=val_dataloader, epochs=epochs)
+        train(bert_classifier, train_dataloader, device, loss_fn,
+                             optimizer, scheduler, epochs=epochs)
 
-        with open(f"../results/best_{i}.csv", "a") as f:
-            f.write(f'{t_acc},{v_acc}\n')
+        predictions = bert_predict(bert_classifier, test_dataloader)
+        np.save(f"../results/best_predictions_{i}.npy",predictions)
+
