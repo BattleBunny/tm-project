@@ -34,12 +34,12 @@ if __name__ == "__main__":
 
     # get tokenized data
     # first check whether data already exists
-    if os.path.exists("../data/bert_tokenized/bert_train_data.pkl") and \
-       os.path.exists("../data/bert_tokenized/bert_test_data.pkl"):
+    if os.path.exists("/data/s1620444/tm/data/bert_tokenized/bert_train_data.pkl") and \
+       os.path.exists("/data/s1620444/tm/data/bert_tokenized/bert_test_data.pkl"):
 
-        with open("../data/bert_tokenized/bert_train_data.pkl", "rb") as f:
+        with open("/data/s1620444/tm/data/bert_tokenized/bert_train_data.pkl", "rb") as f:
             train_data = pickle.load(f)
-        with open("../data/bert_tokenized/bert_test_data.pkl", "rb") as f:
+        with open("/data/s1620444/tm/data/bert_tokenized/bert_test_data.pkl", "rb") as f:
             test_data = pickle.load(f)
 
 
