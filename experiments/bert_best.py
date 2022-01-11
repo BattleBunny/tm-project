@@ -12,11 +12,13 @@ from bert_preprocessing import preprocessing_for_bert
 
 if __name__ == "__main__":
 
+    torch.cuda.empty_cache()
+
     # setup torch/cuda
     if torch.cuda.is_available():
         device = torch.device("cuda")
         print(f'There are {torch.cuda.device_count()} GPU(s) available.')
-        print('Device name:', torch.cuda.get_device_name(1))
+        print('Device name:', torch.cuda.get_device_name(int(sys.argv[1])))
         device = torch.device(int(sys.argv[1]))
 
     else:
@@ -42,7 +44,6 @@ if __name__ == "__main__":
         with open("/data/s1620444/tm/data/bert_tokenized/bert_test_data.pkl", "rb") as f:
             test_data = pickle.load(f)
 
-
     else:
         print("Must run bert_preprocessing first")
         sys.exit()
@@ -54,9 +55,10 @@ if __name__ == "__main__":
     test_inputs, test_masks = preprocessing_for_bert(test_data.text.values)
 
     map_sent2int = {"negative": 0, "neutral": 1, "positive": 2}
-    y_train = np.array([map_sent2int[label] for label in train_data.label.values])
-    y_test = np.array([map_sent2int[label] for label in test_data.label.values])
-
+    y_train = np.array([map_sent2int[label]
+                        for label in train_data.label.values])
+    y_test = np.array([map_sent2int[label]
+                       for label in test_data.label.values])
 
     # run experiments, write results
     train_dataloader, test_dataloader = create_data_loaders(
@@ -73,8 +75,7 @@ if __name__ == "__main__":
                                                                  lr=lr, epochs=epochs, hidden_layer=hidden_layer)
 
         train(bert_classifier, train_dataloader, device, loss_fn,
-                             optimizer, scheduler, epochs=epochs)
+              optimizer, scheduler, epochs=epochs)
 
-        predictions = bert_predict(bert_classifier, test_dataloader)
-        np.save(f"../results/best_predictions_{i}.npy",predictions)
-
+        predictions = bert_predict(bert_classifier, test_dataloader, device)
+        np.save(f"../results/best_predictions_{i}.npy", predictions)

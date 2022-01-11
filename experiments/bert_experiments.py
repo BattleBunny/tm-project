@@ -88,7 +88,7 @@ if __name__ == "__main__":
                                                                      lr=lr, epochs=epochs, hidden_layer=hidden_layer)
 
             t_acc, v_acc = train(bert_classifier, train_dataloader, device, loss_fn,
-                                 optimizer, scheduler, val_dataloader=val_dataloader, epochs=epochs)
+                                 optimizer, scheduler, val_dataloader=val_dataloader, epochs=epochs, evaluation=True)
 
             with open(f"../results/{lr}_{hidden_layer}.csv", "a") as f:
                 f.write(f'{t_acc},{v_acc}\n')

@@ -203,18 +203,19 @@ def train(model, train_dataloader, device, loss_fn, optimizer, scheduler, val_da
         # =======================================
     # After the completion of each training epoch, measure the model's performance
     # on our validation set.
-    val_loss, val_accuracy = evaluate(
-        model, val_dataloader, device, loss_fn)
-    train_loss, train_accuracy = evaluate(
-        model, train_dataloader, device, loss_fn)
+    if evaluation:
+        val_loss, val_accuracy = evaluate(
+            model, val_dataloader, device, loss_fn)
+        train_loss, train_accuracy = evaluate(
+            model, train_dataloader, device, loss_fn)
 
-    # Print performance over the entire training data
-    time_elapsed = time.time() - t0_epoch
+        # Print performance over the entire training data
+        time_elapsed = time.time() - t0_epoch
 
-    print(f"{train_accuracy:^12.6f} | {val_accuracy:^9.2f} ")
+        print(f"{train_accuracy:^12.6f} | {val_accuracy:^9.2f} ")
 
-    print("Training complete!")
-    return train_accuracy, val_accuracy
+        print("Training complete!")
+        return train_accuracy, val_accuracy
 
 
 def evaluate(model, val_dataloader, device, loss_fn):
